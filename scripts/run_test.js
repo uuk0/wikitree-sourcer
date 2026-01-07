@@ -79,6 +79,7 @@ const siteNames = [
   "yadvashem",
   "ushmm",
   "ecpp",
+  "nycvital",
 ];
 
 function testSuiteEnabled(parameters, testSuiteName) {

@@ -607,6 +607,16 @@
         "base/browser/content/content_common.js",
         "site/ecpp/browser/ecpp_content.js"
       ]
+    },
+    {
+      "matches": [
+        "*://a860-historicalvitalrecords.nyc.gov/*"
+      ],
+      "run_at": "document_idle",
+      "js": [
+        "base/browser/content/content_common.js",
+        "site/nycvital/browser/nycvital_content.js"
+      ]
     }
   ],
   "options_ui": {
@@ -1089,6 +1099,14 @@
       ],
       "matches": [
         "*://ecpp.ucr.edu/*"
+      ]
+    },
+    {
+      "resources": [
+        "site/nycvital/core/nycvital_extract_data.mjs"
+      ],
+      "matches": [
+        "*://a860-historicalvitalrecords.nyc.gov/*"
       ]
     }
   ],

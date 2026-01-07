@@ -22,44 +22,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import { YadvashemUriBuilder } from "./yadvashem_uri_builder.mjs";
+import { simpleBuildCitationWrapper } from "../../../base/core/citation_builder.mjs";
 
-function buildSearchUrl(buildUrlInput) {
-  const gd = buildUrlInput.generalizedData;
-
-  var builder = new YadvashemUriBuilder();
-
-  builder.addSearchParameter("page", "1");
-
-  const lastName = gd.inferLastName();
-  if (lastName) {
-    builder.addSurname(lastName);
-  }
-
-  const givenNames = gd.inferForenames();
-  if (givenNames) {
-    builder.addGivenNames(givenNames);
-  }
-
-  const birthYear = gd.inferBirthYear();
-  if (birthYear) {
-    builder.addYearOfBirth(birthYear);
-  }
-
-  const deathYear = gd.inferDeathYear();
-  if (deathYear) {
-    builder.addYearOfDeath(deathYear);
-  }
-
-  const url = builder.getUri();
-
-  //console.log("URL is " + url);
-
-  var result = {
-    url: url,
-  };
-
-  return result;
+function buildNycvitalUrl(ed, builder) {
+  return ed.url;
 }
 
-export { buildSearchUrl };
+function buildSourceTitle(ed, gd, builder) {
+  if (ed.fields["borough"]) {
+    builder.sourceTitle += "Historical Vital Records of New York City, " + ed.fields["borough"];
+  }
+  else {
+    builder.sourceTitle += "Historical Vital Records of New York City";
+  }
+}
+
+function buildSourceReference(ed, gd, builder) {
+  builder.sourceReference = "Certificate " + ed.fields["certificate"];
+}
+
+function buildRecordLink(ed, gd, builder) {
+  var nycvitalUrl = buildNycvitalUrl(ed, builder);
+
+  let recordLink = "[" + nycvitalUrl + " New York City - Historical Vital Records Record]";
+  builder.recordLinkOrTemplate = recordLink;
+}
+
+function buildCoreCitation(ed, gd, builder) {
+  buildSourceTitle(ed, gd, builder);
+  buildSourceReference(ed, gd, builder);
+  buildRecordLink(ed, gd, builder);
+  builder.addStandardDataString(gd);
+}
+
+function buildCitation(input) {
+  return simpleBuildCitationWrapper(input, buildCoreCitation);
+}
+
+export { buildCitation };

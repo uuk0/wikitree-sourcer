@@ -22,44 +22,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import { YadvashemUriBuilder } from "./yadvashem_uri_builder.mjs";
+import { extractData } from "../../extension/site/nycvital/core/nycvital_extract_data.mjs";
+import { generalizeData } from "../../extension/site/nycvital/core/nycvital_generalize_data.mjs";
+import { buildCitation } from "../../extension/site/nycvital/core/nycvital_build_citation.mjs";
 
-function buildSearchUrl(buildUrlInput) {
-  const gd = buildUrlInput.generalizedData;
+import { runExtractDataTests } from "../test_utils/test_extract_data_utils.mjs";
+import { runGeneralizeDataTests } from "../test_utils/test_generalize_data_utils.mjs";
+import { runBuildCitationTests } from "../test_utils/test_build_citation_utils.mjs";
 
-  var builder = new YadvashemUriBuilder();
+const regressionData = [
+  /*
+  {
+    caseName: "b_1902_calvert_florence",
+    url: "https://www.nycvital.org.uk/cgi/information.pl?r=107280059:7282&d=bmd_1649064119",
+  },
+  */
+];
 
-  builder.addSearchParameter("page", "1");
+async function runTests(testManager) {
+  await runExtractDataTests("nycvital", extractData, regressionData, testManager);
 
-  const lastName = gd.inferLastName();
-  if (lastName) {
-    builder.addSurname(lastName);
-  }
+  await runGeneralizeDataTests("nycvital", generalizeData, regressionData, testManager);
 
-  const givenNames = gd.inferForenames();
-  if (givenNames) {
-    builder.addGivenNames(givenNames);
-  }
-
-  const birthYear = gd.inferBirthYear();
-  if (birthYear) {
-    builder.addYearOfBirth(birthYear);
-  }
-
-  const deathYear = gd.inferDeathYear();
-  if (deathYear) {
-    builder.addYearOfDeath(deathYear);
-  }
-
-  const url = builder.getUri();
-
-  //console.log("URL is " + url);
-
-  var result = {
-    url: url,
-  };
-
-  return result;
+  const functions = { buildCitation: buildCitation };
+  await runBuildCitationTests("nycvital", functions, regressionData, testManager);
 }
 
-export { buildSearchUrl };
+export { runTests };
