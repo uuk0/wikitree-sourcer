@@ -43,6 +43,8 @@ function buildSearchUrl(buildUrlInput) {
 
   // TODO: add type and year parameters as needed
 
+  builder.addSearchParameter("submit", "Search");
+
   const url = builder.getUri();
 
   //console.log("URL is " + url);
