@@ -50,7 +50,7 @@ class EcppEdReader extends ExtractedDataReader {
     if (section && section.fields) {
       let fields = section.fields;
       let field = fields[fieldId];
-      if (field && field.value) {
+      if (field && field.value && field.value != "[Unstated]") {
         return field.value;
       }
     }
@@ -132,20 +132,97 @@ class EcppEdReader extends ExtractedDataReader {
         usCounty: "Santa Barbara",
       },
       LPC: {
-        placeString: "Mission La Purísima Concepcion",
+        placeString: "Misión La Purísima Concepcion",
         usCounty: "Santa Barbara",
       },
       SAP: {
-        placeString: "Mission San Antonio de Padua",
+        placeString: "Misión San Antonio de Padua",
         usCounty: "Santa Barbara",
       },
       SB: {
-        placeString: "Mission Santa Barbara",
+        placeString: "Misión Santa Barbara",
         usCounty: "Santa Barbara",
+      },
+      SBV: {
+        placeString: "Misión San Buenaventura",
+        usCounty: "Santa Barbara",
+      },
+      SC: {
+        placeString: "Misión San Carlos Borromeo",
+        usCounty: "Monterey",
+      },
+      SCL: {
+        placeString: "Misión Santa Clara",
+        usCounty: "Santa Clara",
+      },
+      SCZ: {
+        placeString: "Misión Santa Cruz",
+        usCounty: "Santa Cruz",
+      },
+      SD: {
+        placeString: "Misión San Diego",
+        usCounty: "San Diego",
+      },
+      SFD: {
+        placeString: "Misión San Francisco de Asís",
+        usCounty: "Santa Francisco",
+      },
+      SFR: {
+        placeString: "Misión San Fernando",
+        usCounty: "San Fernando",
+      },
+      SFS: {
+        placeString: "Misión San Francisco Solano",
+        usCounty: "Sonoma",
+      },
+      SG: {
+        placeString: "Misión San Gabriel Arcángel",
+        usCounty: "Los Angeles",
+      },
+      SI: {
+        placeString: "Misión Santa Inés",
+        usCounty: "Santa Barbara",
+      },
+      SJB: {
+        placeString: "Misión San Juan Bautista",
+        usCounty: "San Benito",
+      },
+      SJC: {
+        placeString: "Misión San Juan Capistrano",
+        usCounty: "Orange",
+      },
+      SJS: {
+        placeString: "Misión San Jose",
+        usCounty: "Santa Clara",
+      },
+      SLD: {
+        placeString: "Misión Nuestra Señora de la Soledad",
+        usCounty: "Monterey",
+      },
+      SLO: {
+        placeString: "Misión San Luis Obispo",
+        usCounty: "San Luis Obispo",
+      },
+      SLR: {
+        placeString: "Misión San Luis Rey",
+        usCounty: "San Diego",
+      },
+      SMA: {
+        placeString: "Misión San Miguel Arcángel",
+        usCounty: "San Luis Obispo",
+      },
+      SRA: {
+        placeString: "Misión San Rafael",
+        usCounty: "Marin",
       },
     };
 
     const datesForPlaceNames = [
+      {
+        startDate: "1 Jan 1804",
+        state: "Nueva California",
+        country: "Nueva España",
+      },
       {
         startDate: "28 Sep 1821",
         state: "Alta California",
@@ -258,7 +335,7 @@ class EcppEdReader extends ExtractedDataReader {
   makePlaceObjFromOrigin(originString) {
     let placeObj = new PlaceObj();
 
-    if (originString && originString != "[Unstated]") {
+    if (originString) {
       const endingsToRemove = [", rancheria de", ", Rancheria de", ", pueblo de", ", Pueblo de"];
       for (let ending of endingsToRemove) {
         if (originString.endsWith(ending)) {
@@ -360,6 +437,10 @@ class EcppEdReader extends ExtractedDataReader {
       let age = this.getFieldValue("age");
       let ageUnits = this.getFieldValue("unit");
 
+      if (age.startsWith("como ")) {
+        age = age.substring(5);
+      }
+
       let baptismDateObj = this.makeDateObjFromEcppDate(baptismDate);
       if (!age) {
         if (baptismDateObj) {
@@ -371,22 +452,26 @@ class EcppEdReader extends ExtractedDataReader {
       // there is an age - we can try to work out birth date
       if (baptismDate && age && ageUnits) {
         if (ageUnits == "d") {
-          let numDays = age.toString();
-          let birthDateString = DateUtils.subtractDaysFromDateString(baptismDate, numDays);
-          if (birthDateString) {
-            let birthDateObj = new DateObj();
-            birthDateObj.dateString = birthDateString;
-            birthDateObj.qualifier = dateQualifiers.EXACT;
-            return birthDateObj;
+          let numDays = Number(age);
+          if (!isNaN(numDays)) {
+            let birthDateString = DateUtils.subtractDaysFromDateString(baptismDate, numDays);
+            if (birthDateString) {
+              let birthDateObj = new DateObj();
+              birthDateObj.dateString = birthDateString;
+              birthDateObj.qualifier = dateQualifiers.EXACT;
+              return birthDateObj;
+            }
           }
         } else if (ageUnits == "a") {
-          let numYears = age.toString();
-          let birthDateString = DateUtils.subtractYearsFromDateString(baptismDate, numYears);
-          if (birthDateString) {
-            let birthDateObj = new DateObj();
-            birthDateObj.dateString = birthDateString;
-            birthDateObj.qualifier = dateQualifiers.ABOUT;
-            return birthDateObj;
+          let numYears = Number(age);
+          if (!isNaN(numYears)) {
+            let birthDateString = DateUtils.subtractYearsFromDateString(baptismDate, numYears);
+            if (birthDateString) {
+              let birthDateObj = new DateObj();
+              birthDateObj.dateString = birthDateString;
+              birthDateObj.qualifier = dateQualifiers.ABOUT;
+              return birthDateObj;
+            }
           }
         }
       }
@@ -420,6 +505,16 @@ class EcppEdReader extends ExtractedDataReader {
 
     const slashDateRegex = /^\d\d?\/\d\d?\/\d\d\d\d$/;
     if (deathDate) {
+      let elDiaIndex = deathDate.indexOf(" el dia");
+      if (elDiaIndex != -1) {
+        deathDate = deathDate.substring(0, elDiaIndex);
+      } else if (deathDate.startsWith("el dia")) {
+        if (deathDate.startsWith("el dia antecedente")) {
+          if (burialDate) {
+            deathDate = DateUtils.subtractDaysFromDateString(burialDate, 1);
+          }
+        }
+      }
       return this.makeDateObjFromEcppDate(deathDate);
     }
 
@@ -439,6 +534,11 @@ class EcppEdReader extends ExtractedDataReader {
   getAgeAtEvent() {
     let age = this.getFieldValue("age");
     let ageUnits = this.getFieldValue("unit");
+
+    if (age.startsWith("como ")) {
+      age = age.substring(5);
+    }
+
     if (this.recordType == RT.Marriage) {
       if (this.primaryPersonIndex == 0) {
         age = this.getFieldValue("groom_age");
