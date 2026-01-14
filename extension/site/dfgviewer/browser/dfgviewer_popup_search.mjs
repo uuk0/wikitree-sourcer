@@ -41,8 +41,6 @@ function shouldShowSearchMenuItem(data, filter) {
     ],
   };
 
-  return false;  // Disable all serach functionality for now
-
   if (!shouldShowSiteSearch(data.generalizedData, filter, siteConstraints)) {
     return false;
   }
@@ -54,9 +52,10 @@ function shouldShowSearchMenuItem(data, filter) {
 // Menu actions
 //////////////////////////////////////////////////////////////////////////////////////////
 
-async function dfgviewerSearch(generalizedData) {
+async function archiveNRWviewerSearch(generalizedData) {
+  generalizedData.site = "archive.nrw";
   const input = { generalizedData: generalizedData, options: options };
-  doAsyncActionWithCatch("DFG Viewer Search", input, async function () {
+  doAsyncActionWithCatch("archive.nrw Search", input, async function () {
     let loadedModule = await import(`../core/dfgviewer_build_search_url.mjs`);
     doSearch(loadedModule, input);
   });
@@ -70,6 +69,10 @@ function addDfgviewerDefaultSearchMenuItem(menu, data, backFunction, filter) {
   // addMenuItem(menu, "Search DFG Viewer", function (element) {
   //   dfgviewerSearch(data.generalizedData);
   // });
+
+  addMenuItem(menu, "Search Archive.NRW", function (element) {
+    archiveNRWviewerSearch(data.generalizedData);
+  });
 
   // TODO: add search menus for each archive instead
 

@@ -22,12 +22,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import { DfgviewerUriBuilder } from "./dfgviewer_uri_builder.mjs";
+import { ArchiveNRWUriBuilder } from "./dfgviewer_uri_builder.mjs";
 
 function buildSearchUrl(buildUrlInput) {
   const gd = buildUrlInput.generalizedData;
 
-  var builder = new DfgviewerUriBuilder();
+  let builder = null;
+  if (gd.site == "archive.nrw") {
+    builder = new ArchiveNRWUriBuilder();
+  }
+  else {
+    alert("Internal error: "+gd.site+" search not supported in DFG Viewer search URL builder");
+    alert(JSON.stringify(buildUrlInput));
+    console.log("Unsupported site in DFG Viewer search URL builder: " + gd.site);
+    return;
+  }
 
   // call methods on builder here
 

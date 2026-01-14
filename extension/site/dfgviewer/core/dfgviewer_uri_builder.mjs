@@ -24,77 +24,10 @@ SOFTWARE.
 
 import { StringUtils } from "../../../base/core/string_utils.mjs";
 
-class DfgviewerUriBuilder {
+class ArchiveNRWUriBuilder {
   constructor() {
-    this.uri = "UNSUPPORTED";
+    this.uri = "https://www.archive.nrw.de/archivsuche";
     this.searchTermAdded = false;
-  }
-
-  addSearchTerm(string) {
-    if (string == undefined || string == "") {
-      return;
-    }
-    if (!this.searchTermAdded) {
-      this.uri = this.uri.concat("?", string);
-      this.searchTermAdded = true;
-    } else {
-      this.uri = this.uri.concat("&", string);
-    }
-  }
-
-  addSearchParameter(parameter, value) {
-    if (value == undefined || value == "") {
-      return;
-    }
-
-    const encodedValue = encodeURIComponent(value);
-
-    if (!this.searchTermAdded) {
-      this.uri = this.uri.concat("?", parameter, "=", encodedValue);
-      this.searchTermAdded = true;
-    } else {
-      this.uri = this.uri.concat("&", parameter, "=", encodedValue);
-    }
-  }
-
-  addType(string) {
-    this.addSearchParameter("type", string);
-  }
-
-  addSurname(string) {
-    this.addSearchParameter("surname", StringUtils.removeExtendedAsciiCharacters(string));
-  }
-
-  addGivenNames(string) {
-    this.addSearchParameter("given", StringUtils.removeExtendedAsciiCharacters(string));
-  }
-
-  addOtherSurname(string) {
-    this.addSearchParameter("s_surname", StringUtils.removeExtendedAsciiCharacters(string));
-  }
-
-  addOtherGivenNames(string) {
-    this.addSearchParameter("s_given", StringUtils.removeExtendedAsciiCharacters(string));
-  }
-
-  addStartYear(string) {
-    this.addSearchParameter("start", string);
-  }
-
-  addEndYear(string) {
-    this.addSearchParameter("end", string);
-  }
-
-  addAgeAtDeath(string) {
-    this.addSearchParameter("aad", string);
-  }
-
-  addVolume(string) {
-    this.addSearchParameter("vol", string);
-  }
-
-  addPage(string) {
-    this.addSearchParameter("pgno", string);
   }
 
   getUri() {
@@ -102,4 +35,4 @@ class DfgviewerUriBuilder {
   }
 }
 
-export { DfgviewerUriBuilder };
+export { ArchiveNRWUriBuilder };
