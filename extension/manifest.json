@@ -1,6 +1,6 @@
 {
   "name": "WikiTree Sourcer",
-  "version": "2.13.0",
+  "version": "2.13.2",
   "description": "WikiTree Sourcer assists in finding and citing genealogy sources for use on wikitree.com.",
   "permissions": [
     "activeTab",
@@ -610,6 +610,16 @@
     },
     {
       "matches": [
+        "*://*.auschwitz.org/*"
+      ],
+      "run_at": "document_idle",
+      "js": [
+        "base/browser/content/content_common.js",
+        "site/ausmem/browser/ausmem_content.js"
+      ]
+    },
+    {
+      "matches": [
         "*://a860-historicalvitalrecords.nyc.gov/*"
       ],
       "run_at": "document_idle",
@@ -1099,6 +1109,14 @@
       ],
       "matches": [
         "*://ecpp.ucr.edu/*"
+      ]
+    },
+    {
+      "resources": [
+        "site/ausmem/core/ausmem_extract_data.mjs"
+      ],
+      "matches": [
+        "*://*.auschwitz.org/*"
       ]
     },
     {
