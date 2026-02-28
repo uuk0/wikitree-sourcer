@@ -30,14 +30,6 @@ function extractData(document, url) {
   }
   result.success = false;
 
-  /*
-  const entries = document.querySelectorAll("table > tbody > tr[class^=entrybmd_]");
-  //console.log("entriesQuery size is: " + entriesQuery.length);
-  if (entries.length < 1) {
-    return result;
-  }
-  */
-
   let metadata_table = document.querySelector("div[id=\"top\"] > table.titulek_popis");
   if (!metadata_table) {
     alert("error");
@@ -66,8 +58,6 @@ function extractData(document, url) {
   }
 
   result.success = true;
-
-  //console.log(result);
 
   return result;
 }

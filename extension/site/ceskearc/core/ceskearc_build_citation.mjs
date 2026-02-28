@@ -24,22 +24,80 @@ SOFTWARE.
 
 import { simpleBuildCitationWrapper } from "../../../base/core/citation_builder.mjs";
 
+let CONTENT_TRANSLATION = {
+  "B": "Birth",
+  "M": "Marriage",
+  "D": "Death",
+}
+
+/**
+ * {
+  "url": "https://digi.ceskearchivy.cz/8639/86/2037/4583/5/0",
+  "success": true,
+  "metadata": {
+    "seat": "Vyšší Brod",
+    "time extent": "1809–1872",
+    "content": "B",
+    "district": "Český Krumlov",
+    "book": "6",
+    "church": "Roman Catholic Church"
+  },
+  "record_type": "Parish register",
+  "page_number": "86"
+}
+ */
 function buildCeskearcUrl(ed, builder) {
   return ed.url;
 }
 
 function buildSourceTitle(ed, gd, builder) {
-  builder.sourceTitle += "Put Source Title here";
+  if (ed.metadata["original title"]) {
+    builder.sourceTitle += ed.metadata["original title"] + " / ";
+  }
+  else if (ed.record_type) {
+    builder.sourceTitle += ed.record_type + " / ";
+  }
+
+  if (ed.metadata.church) {
+    builder.sourceTitle += ed.metadata.church + " / ";
+  }
+
+  if (ed.metadata.seat) {
+    builder.sourceTitle += ed.metadata.seat + " / ";
+  }
+  if (ed.metadata.district) {
+    builder.sourceTitle += ed.metadata.district + " / ";
+  }
+  if (ed.metadata.municipality) {
+    builder.sourceTitle += ed.metadata.municipality + " / ";
+  }
+
+  if (ed.metadata.content) {
+    builder.sourceTitle += (CONTENT_TRANSLATION[ed.metadata.content] || ed.metadata.content) + " / ";
+  }
+
+  if (ed.metadata["time extent"]) {
+    builder.sourceTitle += ed.metadata["time extent"] + " / ";
+  }
+
+  if (builder.sourceTitle.substring(builder.sourceTitle.length - 3) == " / ") {
+    builder.sourceTitle = builder.sourceTitle.substring(0, builder.sourceTitle.length - 3);
+  }
 }
 
 function buildSourceReference(ed, gd, builder) {
-  builder.sourceReference = "Put Source Reference here";
+  builder.addSourceReferenceField("Image", ed.page_number);
 }
 
 function buildRecordLink(ed, gd, builder) {
   var ceskearcUrl = buildCeskearcUrl(ed, builder);
 
-  let recordLink = "[" + ceskearcUrl + " Ceske Archivy Record]";
+  let recordLink;
+  if (ed.record_type) {
+    recordLink = "[" + ceskearcUrl + " Ceske Archivy / "+ed.record_type+"]";
+  } else {
+    recordLink = "[" + ceskearcUrl + " Ceske Archivy]";
+  }
   builder.recordLinkOrTemplate = recordLink;
 }
 
