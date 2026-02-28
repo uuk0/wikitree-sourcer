@@ -82,6 +82,7 @@ const siteNames = [
   "panb",
   "ausmem",
   "morbihan",
+  "ceskearc",
 ];
 
 function testSuiteEnabled(parameters, testSuiteName) {
