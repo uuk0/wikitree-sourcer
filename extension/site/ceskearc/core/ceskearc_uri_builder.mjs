@@ -26,10 +26,10 @@ import { StringUtils } from "../../../base/core/string_utils.mjs";
 
 class CeskearcUriBuilder {
   constructor() {
-    //!!!!!!!!!! CHANGES NEEDED HERE AFTER RUNNING create_new_site SCRIPT !!!!!!!!!!
-    // Change the URL below to the start of the search URL for your site
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    this.uri = "https://www.ceskearc.org/search";
+    // https://digi.ceskearchivy.cz/pages/search.php?
+    // new=1&menu=1&sst=1&id=&doctree=10&dates=&searchtype=&searcharch=&date_from=&date_to=
+    // &spojkae=%2B&param=&spojka=%2B&role=*&klictxt=&evc=test&search=
+    this.uri = "https://digi.ceskearchivy.cz/pages/search.php";
     this.searchTermAdded = false;
   }
 
@@ -60,44 +60,20 @@ class CeskearcUriBuilder {
     }
   }
 
-  addType(string) {
-    this.addSearchParameter("type", string);
+  addDateRange(from, to) {
+    if (from != undefined && from != "") {
+      this.addSearchParameter("date_from", from);
+    }
+    if (to != undefined && to != "") {
+      this.addSearchParameter("date_to", to);
+    }
   }
 
-  addSurname(string) {
-    this.addSearchParameter("surname", StringUtils.removeExtendedAsciiCharacters(string));
-  }
-
-  addGivenNames(string) {
-    this.addSearchParameter("given", StringUtils.removeExtendedAsciiCharacters(string));
-  }
-
-  addOtherSurname(string) {
-    this.addSearchParameter("s_surname", StringUtils.removeExtendedAsciiCharacters(string));
-  }
-
-  addOtherGivenNames(string) {
-    this.addSearchParameter("s_given", StringUtils.removeExtendedAsciiCharacters(string));
-  }
-
-  addStartYear(string) {
-    this.addSearchParameter("start", string);
-  }
-
-  addEndYear(string) {
-    this.addSearchParameter("end", string);
-  }
-
-  addAgeAtDeath(string) {
-    this.addSearchParameter("aad", string);
-  }
-
-  addVolume(string) {
-    this.addSearchParameter("vol", string);
-  }
-
-  addPage(string) {
-    this.addSearchParameter("pgno", string);
+  addSearchText(string) {
+    if (string == undefined || string == "") {
+      return;
+    }
+    this.addSearchParameter("evc", string);
   }
 
   getUri() {
