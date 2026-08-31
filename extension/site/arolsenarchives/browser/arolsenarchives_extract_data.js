@@ -30,6 +30,48 @@ function monthName2Number(month_name) {
   return month_names.indexOf(month_name) + 1;
 }
 
+SEARCH_KEYS = [
+    "LastName",
+    "FirstName",
+    "Dob",
+    "PrisonerNumber",
+]
+
+function extractDataSearchpage(document, url, result) {
+  let collection_url = document.querySelector("mat-grid-tile:nth-child(1) > figure > a:nth-child(2)").getAttribute("href");
+  result.collection_url = collection_url;
+
+  let doc_ids = new Set();
+  for (let doc of document.querySelectorAll("div[class=\"title_counter ng-star-inserted\"]")) {
+    let doc_id = doc.textContent.trim();
+    if (doc_id.match("DocID:")) {
+      doc_id = doc_id.substring(doc_id.indexOf("DocID:") + "DocID:".length).trim();
+    }
+    doc_ids.add(doc_id);
+  }
+  result.doc_ids = [...doc_ids];
+
+  result.person_data = {};
+  let selected_cell = document.querySelector("mat-row[class=\"mat-row cdk-row selected ng-star-inserted\"]");
+  for (let cell of selected_cell.querySelectorAll("mat-cell")) {
+    let key = cell.getAttribute("class");
+
+    for (let key_candidate of SEARCH_KEYS) {
+      if (key.includes(key_candidate)) {
+        key = key_candidate;
+        break;
+      }
+    }
+
+    let content = cell.textContent.trim();
+    if (content) {
+      result.person_data[key] = content;
+    }
+  }
+
+  result.success = true;
+}
+
 function extractData(document, url) {
   var result = {};
 
@@ -46,9 +88,9 @@ function extractData(document, url) {
   // only allow extract from documents for now
   // but also detect a search person page where comments can be added
   if (!url.match("/document/") && !url.match("/archive/")) {
-    if (url.match("/search/person/") && result.has_disqus) {
+    if (url.match("/search/person/")) {
       result.page_type = "searchPerson";
-      result.success = true;
+      extractDataSearchpage(document, url, result);
     }
     return result;
   }
